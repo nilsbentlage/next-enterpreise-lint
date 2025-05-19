@@ -1,0 +1,38 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "appdir",
+    "blazity",
+    "clsx",
+    "codebase",
+    "Czechowski",
+    "dont",
+    "healthz",
+    "intl",
+    "Jabłoński",
+    "Jakub",
+    "Jumpstart",
+    "Klepacki",
+    "nextjs",
+    "ouputs",
+    "pnpm",
+    "radix",
+    "raphaelbadia",
+    "srcset",
+    "tailwindcss",
+    "Tomasz",
+    "vercel",
+    "viewports"
+  ],
+  "ignorePaths": ["node_modules", ".git", ".next", "pnpm-lock.yaml", "public", "coverage", "build", "dist"],
+  "ignoreRegExpList": [
+    "/'.*?'/",
+    "/\\(.*?\\)/",
+    "/\\[.*?\\]/",
+    "/\\`.*?\\`/",
+    "\\(.*\\)",
+    "import\\s+.*\\s+from\\s+.*",
+    "from\\s+.*"
+  ]
+}

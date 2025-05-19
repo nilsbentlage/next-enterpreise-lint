@@ -1,0 +1,12 @@
+echo "🔍 Running pre-commit checks..."
+
+# Run lint-staged to format, lint, and check for console.logs
+pnpm lint-staged || { echo "❌ Lint-staged failed"; exit 1; }
+
+# Run spell checker
+pnpm exec cspell "**/*.{js,jsx,ts,tsx,md,json,html}" --no-progress || { echo "❌ Spell checker failed"; exit 1; }
+
+# Run unit tests
+pnpm test || { echo "❌ Unit tests failed"; exit 1; }
+
+echo "✅ All pre-commit checks passed!"

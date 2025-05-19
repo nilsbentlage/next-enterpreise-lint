@@ -1,0 +1,62 @@
+echo "🔍 Running pre-push checks..."
+
+# Verify that the build works
+echo "📦 Verifying build..."
+pnpm run build || { echo "❌ Build failed"; exit 1; }
+
+# Run security checks for user access control
+echo "🔒 Running security checks..."
+
+# Read whitelist from the text file - using proper path resolution
+WHITELIST_FILE="$(dirname "$0")/../security-whitelist.txt"
+
+# Check if whitelist file exists, if not use default values
+if [ -f "$WHITELIST_FILE" ]; then
+  # Convert newline-separated file to pipe-separated list
+  WHITELIST=$(grep -v '^#' "$WHITELIST_FILE" | tr '\n' '|' | sed 's/|$//')
+else
+  # Default whitelist if file not found
+  WHITELIST="app/api/health/route.ts|app/page.tsx|app/layout.tsx"
+fi
+
+# Check for missing authentication in routes - only in app directory, not components
+# Exclude whitelist from grep results
+FILES=$(pnpm exec grep -r --include="*.{js,jsx,ts,tsx}" -L "getServerSession\|useSession" app/ || echo "")
+
+# Skip if no files found
+if [ -z "$FILES" ]; then
+  echo "No files to check"
+else
+  # Filter out whitelisted files
+  NON_WHITELISTED_FILES=""
+  for FILE in $FILES; do
+    IS_WHITELISTED=false
+    for PATTERN in $(echo $WHITELIST | tr '|' ' '); do
+      if [[ "$FILE" == *"$PATTERN"* ]]; then
+        IS_WHITELISTED=true
+        break
+      fi
+    done
+    
+    if [ "$IS_WHITELISTED" = false ]; then
+      NON_WHITELISTED_FILES="$NON_WHITELISTED_FILES $FILE"
+    fi
+  done
+
+  if [ -n "$NON_WHITELISTED_FILES" ]; then
+    echo $NON_WHITELISTED_FILES
+    echo "❌ Found routes without session validation" && exit 1
+  fi
+fi
+
+# Optional: Run E2E tests (uncomment if you want to run these before pushing)
+# echo "🧪 Running E2E tests (headless mode)..."
+# pnpm e2e:headless || { echo "❌ E2E tests failed"; exit 1; }
+
+# You can add additional checks here, such as:
+# - Dependency vulnerability scanning
+# - Code complexity metrics
+# - TypeScript type checking (tsc --noEmit)
+# - Bundle size analysis
+
+echo "✅ All pre-push checks passed!"

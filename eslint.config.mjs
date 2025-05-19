@@ -7,6 +7,10 @@ import eslintPluginNext from "@next/eslint-plugin-next"
 import eslintPluginStorybook from "eslint-plugin-storybook"
 import typescriptEslint from "typescript-eslint"
 
+// Custom rules for auth checks and next-intl i18n
+import authCheckRule from "./eslint-plugins/auth-check.js"
+import nextIntlRules from "./eslint-plugins/next-intl-rules.js"
+
 const eslintIgnore = [
   ".git/",
   ".next/",
@@ -17,6 +21,7 @@ const eslintIgnore = [
   "*.min.js",
   "*.config.js",
   "*.d.ts",
+  "eslint-plugins/"
 ]
 
 const config = typescriptEslint.config(
@@ -31,10 +36,23 @@ const config = typescriptEslint.config(
   {
     plugins: {
       "@next/next": eslintPluginNext,
+      "auth-check": {
+        rules: {
+          "require-auth": authCheckRule,
+        },
+      },
+      "next-intl": {
+        rules: {
+          "missing-string": nextIntlRules,
+        },
+      },
     },
     rules: {
       ...eslintPluginNext.configs.recommended.rules,
       ...eslintPluginNext.configs["core-web-vitals"].rules,
+      "auth-check/require-auth": "error",
+      "next-intl/missing-string": "warn",
+      "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
   {
